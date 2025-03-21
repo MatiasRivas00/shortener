@@ -1,0 +1,45 @@
+version: '3.8'
+services:
+  react-app:
+    image: shortener-frontend
+    ports:
+      - "5173:5173"
+    networks:
+      - shortener
+    environment:
+      - VITE_SHORTENER_API=${VITE_SHORTENER_API}
+      - VITE_SHORT_URL_HOST=${VITE_SHORT_URL_HOST}
+
+
+  api-server:
+    image: shortener-api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    networks:
+      - shortener
+    environment:
+      - MONGODB_URI=${MONGODB_URI}
+      - DEBUG=${DEBUG}
+      - PORT=${PORT}
+
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    networks:
+      - shortener
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+
+networks:
+  shortener:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local
